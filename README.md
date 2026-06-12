@@ -19,6 +19,26 @@ npm.cmd run dev
 
 Open http://localhost:5173
 
+## Deploy With Docker
+
+On an Ubuntu server with Docker and Docker Compose:
+
+```bash
+git clone https://github.com/boluo0208/resume-agent.git
+cd resume-agent
+cp backend/.env.example backend/.env
+nano backend/.env
+docker compose up -d --build
+```
+
+Then open:
+
+```text
+http://your-server-public-ip
+```
+
+The frontend container listens on port 80 and proxies `/api` requests to the backend container.
+
 ## API
 
 - Health: http://localhost:8000/api/health
