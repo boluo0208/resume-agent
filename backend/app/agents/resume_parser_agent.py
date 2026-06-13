@@ -48,6 +48,16 @@ class ResumeParserAgent:
 
 def extract_keywords(text: str) -> list[str]:
     tokens = re.findall(r"[A-Za-z][A-Za-z0-9+#.]{1,}|[\u4e00-\u9fa5]{2,}", text)
-    stopwords = {"负责", "要求", "熟悉", "掌握", "具备", "项目", "经验", "开发", "相关", "能力"}
-    counter = Counter(token for token in tokens if token not in stopwords)
+    stopwords = {
+        "岗位职责", "任职要求", "职位描述", "岗位要求", "工作职责",
+        "负责", "要求", "熟悉", "掌握", "具备", "项目", "经验", "开发", "相关", "能力",
+        "进行", "输出", "维护", "提升", "配合", "优先", "以上", "至少", "一种", "熟练掌握",
+    }
+    normalized = []
+    for token in tokens:
+        token = re.sub(r"^(负责|进行|设计|执行|编写|维护|输出|提升|配合|熟悉|熟练掌握|掌握|具备)", "", token)
+        token = re.sub(r"(等|相关|优先)$", "", token)
+        if token and token not in stopwords:
+            normalized.append(token)
+    counter = Counter(normalized)
     return [word for word, _ in counter.most_common(20)]

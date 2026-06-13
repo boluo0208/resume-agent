@@ -58,6 +58,27 @@ class ParsedResume(BaseModel):
         return stringify_list(value)
 
 
+class JDProfile(BaseModel):
+    """Structured job description extracted by JDParserAgent."""
+    target_role: str
+    job_type: str = "其他"
+    responsibilities: list[str] = []
+    must_have: list[str] = []
+    nice_to_have: list[str] = []
+    keywords: list[str] = []
+    risk_items: list[str] = []
+
+    @field_validator("responsibilities", "must_have", "nice_to_have", "keywords", "risk_items", mode="before")
+    @classmethod
+    def coerce_jd_lists(cls, value):
+        return stringify_list(value)
+
+    @field_validator("target_role", mode="before")
+    @classmethod
+    def coerce_target_role(cls, value):
+        return stringify_item(value)
+
+
 class MatchResult(BaseModel):
     matched_keywords: list[str]
     missing_keywords: list[str]
@@ -68,6 +89,14 @@ class MatchResult(BaseModel):
         return stringify_list(value)
     match_score: int = Field(..., ge=0, le=100)
     target_role: str
+    job_type: str | None = None
+    match_breakdown: dict[str, int] = {}
+    risk_items: list[str] = []
+
+    @field_validator("risk_items", mode="before")
+    @classmethod
+    def coerce_risk_items(cls, value):
+        return stringify_list(value)
 
 
 class ReviewResult(BaseModel):
@@ -106,6 +135,7 @@ class AnalysisResponse(BaseModel):
     suggestions: list[str]
     optimized_resume: str
     parsed_resume: ParsedResume | None = None
+    jd_profile: JDProfile | None = None
     match_result: MatchResult | None = None
     interview_highlights: list[str] = []
     agent_steps: list[AgentStep] = []
